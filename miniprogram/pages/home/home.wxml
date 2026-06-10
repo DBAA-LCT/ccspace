@@ -1,0 +1,38 @@
+<view class="page">
+  <view class="hero panel">
+    <view>
+      <text class="hero-title">给家里老人买点需要的</text>
+      <text class="hero-sub">下单后由小店送到家，也可以和代收快递一起配送</text>
+    </view>
+    <t-button theme="light" class="cart-button" bindtap="goCart">购物车 {{cartCount}}</t-button>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading">
+    <t-loading theme="circular" text="正在加载商品" />
+  </view>
+
+  <view wx:elif="{{products.length === 0}}" class="empty panel">
+    <t-empty description="暂无上架商品" />
+  </view>
+
+  <view wx:else class="product-list">
+    <view wx:for="{{products}}" wx:key="id" class="product-card panel">
+      <image class="product-image" mode="aspectFill" src="{{item.imageUrl}}"></image>
+      <view class="product-body">
+        <view class="product-head">
+          <text class="product-name">{{item.name}}</text>
+          <t-tag theme="warning" variant="light">{{item.category}}</t-tag>
+        </view>
+        <text class="product-desc">{{item.description}}</text>
+        <view class="product-foot">
+          <view>
+            <text class="price">￥{{item.priceYuan}}</text>
+            <text class="muted"> / {{item.unit}}</text>
+            <text class="stock">库存 {{item.stock}}</text>
+          </view>
+          <t-button theme="primary" size="small" class="add-button" data-id="{{item.id}}" bindtap="addToCart">加入</t-button>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

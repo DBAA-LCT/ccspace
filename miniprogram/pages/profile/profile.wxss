@@ -1,0 +1,12 @@
+.profile-form {
+  padding: 24rpx;
+}
+
+.tip {
+  margin-top: 24rpx;
+  padding: 22rpx;
+  color: #6d675d;
+  font-size: 26rpx;
+  line-height: 1.5;
+}
+

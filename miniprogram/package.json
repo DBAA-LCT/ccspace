@@ -1,0 +1,9 @@
+{
+  "name": "home-shop-miniprogram",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "tdesign-miniprogram": "^1.10.0"
+  }
+}
+

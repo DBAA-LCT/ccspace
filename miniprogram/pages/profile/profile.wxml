@@ -1,0 +1,15 @@
+<view class="page">
+  <form class="panel profile-form" bindsubmit="saveProfile">
+    <t-input name="customerName" label="下单人" value="{{profile.customerName}}" placeholder="你的姓名" />
+    <t-input name="customerPhone" label="手机号" value="{{profile.customerPhone}}" placeholder="用于查询订单" type="number" />
+    <t-input name="receiverName" label="收货老人" value="{{profile.receiverName}}" placeholder="老人姓名" />
+    <t-input name="receiverPhone" label="老人电话" value="{{profile.receiverPhone}}" placeholder="可填老人或邻居电话" type="number" />
+    <t-textarea name="address" label="配送地址" value="{{profile.address}}" placeholder="村名、组名、门牌或明显地标" />
+    <t-textarea name="note" label="默认备注" value="{{profile.note}}" placeholder="老人情况、配送偏好等" />
+    <t-button theme="primary" block form-type="submit">保存信息</t-button>
+  </form>
+
+  <view class="panel tip">
+    <text>小程序上线前，需要把后端部署到 HTTPS 域名，并在微信公众平台配置 request 合法域名。</text>
+  </view>
+</view>

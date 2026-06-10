@@ -1,0 +1,37 @@
+<view class="page">
+  <form class="search panel" bindsubmit="searchOrders">
+    <t-input name="phone" value="{{phone}}" placeholder="输入下单人或老人手机号" type="number" />
+    <t-button theme="primary" form-type="submit">查询</t-button>
+  </form>
+
+  <view wx:if="{{loading}}" class="loading">
+    <t-loading theme="circular" text="正在加载订单" />
+  </view>
+
+  <view wx:elif="{{orders.length === 0}}" class="empty panel">
+    <t-empty description="暂无订单" />
+  </view>
+
+  <view wx:else class="order-list">
+    <view wx:for="{{orders}}" wx:key="id" class="order-card panel">
+      <view class="order-head">
+        <view>
+          <text class="order-no">{{item.orderNo}}</text>
+          <text class="muted">{{item.createdText}}</text>
+        </view>
+        <t-tag theme="{{item.statusTheme}}" variant="light">{{item.statusText}}</t-tag>
+      </view>
+      <view class="receiver">
+        <text>{{item.receiverName}} {{item.receiverPhone}}</text>
+        <text class="muted">{{item.address}}</text>
+      </view>
+      <view class="items">
+        <text wx:for="{{item.items}}" wx:key="productId">{{item.name}} x {{item.quantity}}</text>
+      </view>
+      <view class="order-foot">
+        <text class="muted">{{item.note}}</text>
+        <text class="price">￥{{item.totalYuan}}</text>
+      </view>
+    </view>
+  </view>
+</view>
