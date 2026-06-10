@@ -7,9 +7,9 @@
   ],
   "window": {
     "navigationBarTitleText": "家乡小店",
-    "navigationBarBackgroundColor": "#2f6f5e",
-    "navigationBarTextStyle": "white",
-    "backgroundColor": "#f7f5ef"
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#fafafa"
   },
   "usingComponents": {
     "t-button": "tdesign-miniprogram/button/button",
@@ -24,10 +24,10 @@
     "t-divider": "tdesign-miniprogram/divider/divider"
   },
   "tabBar": {
-    "color": "#6d675d",
-    "selectedColor": "#2f6f5e",
-    "backgroundColor": "#fffaf1",
-    "borderStyle": "black",
+    "color": "#888888",
+    "selectedColor": "#171717",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
     "list": [
       {
         "pagePath": "pages/home/home",

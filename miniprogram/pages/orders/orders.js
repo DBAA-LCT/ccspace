@@ -8,11 +8,11 @@ const statusLabels = {
   cancelled: "已取消"
 };
 
-function statusTheme(status) {
-  if (status === "completed") return "success";
-  if (status === "cancelled") return "danger";
-  if (status === "delivering") return "primary";
-  return "warning";
+function statusClass(status) {
+  if (status === "completed") return "status-success";
+  if (status === "cancelled") return "status-error";
+  if (status === "delivering") return "status-info";
+  return "status-warning";
 }
 
 Page({
@@ -26,7 +26,9 @@ Page({
     const profile = getApp().globalData.profile || {};
     const phone = profile.customerPhone || this.data.phone;
     this.setData({ phone });
-    this.loadOrders(phone);
+    if (phone) {
+      this.loadOrders(phone);
+    }
   },
 
   onPullDownRefresh() {
@@ -36,30 +38,33 @@ Page({
   searchOrders(event) {
     const phone = event.detail.value.phone;
     this.setData({ phone });
-    this.loadOrders(phone);
+    if (phone) {
+      this.loadOrders(phone);
+    }
   },
 
-  async loadOrders(phone) {
+  loadOrders(phone) {
     if (!phone) {
       this.setData({ orders: [], loading: false });
-      return;
+      return Promise.resolve();
     }
     this.setData({ loading: true });
-    try {
-      const orders = await api.request(`/api/orders?phone=${encodeURIComponent(phone)}`);
-      this.setData({
-        orders: orders.map(order => ({
-          ...order,
-          totalYuan: api.yuan(order.totalCents),
-          statusText: statusLabels[order.status] || order.status,
-          statusTheme: statusTheme(order.status),
-          createdText: new Date(order.createdAt).toLocaleString()
-        })),
-        loading: false
+    return api.request(`/api/orders?phone=${encodeURIComponent(phone)}`)
+      .then(orders => {
+        this.setData({
+          orders: orders.map(order => ({
+            ...order,
+            totalYuan: api.yuan(order.totalCents),
+            statusText: statusLabels[order.status] || order.status,
+            statusClass: statusClass(order.status),
+            createdText: new Date(order.createdAt).toLocaleString()
+          })),
+          loading: false
+        });
+      })
+      .catch(error => {
+        this.setData({ loading: false, orders: [] });
+        wx.showToast({ title: error.message || "加载失败", icon: "none" });
       });
-    } catch (error) {
-      this.setData({ loading: false });
-      wx.showToast({ title: error.message, icon: "none" });
-    }
   }
 });

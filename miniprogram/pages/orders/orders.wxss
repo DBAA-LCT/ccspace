@@ -1,24 +1,9 @@
-.search {
+.search-bar {
   display: grid;
   grid-template-columns: 1fr 148rpx;
   gap: 14rpx;
   margin-bottom: 24rpx;
   padding: 18rpx;
-}
-
-.search input {
-  min-height: 76rpx;
-  border: 1rpx solid #ded8cb;
-  border-radius: 10rpx;
-  padding: 0 16rpx;
-  background: #fff;
-}
-
-.loading,
-.empty {
-  padding: 48rpx 24rpx;
-  color: #6d675d;
-  text-align: center;
 }
 
 .order-list {
@@ -27,7 +12,7 @@
 }
 
 .order-card {
-  padding: 22rpx;
+  padding: 24rpx;
 }
 
 .order-head,
@@ -41,7 +26,9 @@
 .order-no {
   display: block;
   margin-bottom: 6rpx;
-  font-weight: 700;
+  font-weight: 600;
+  font-size: 26rpx;
+  color: #171717;
 }
 
 .receiver,
@@ -49,11 +36,57 @@
   display: grid;
   gap: 8rpx;
   margin-top: 18rpx;
+}
+
+.receiver-name {
   font-size: 28rpx;
-  line-height: 1.45;
+  font-weight: 500;
+  color: #171717;
+}
+
+.items {
+  padding: 16rpx 0;
+  border-top: 1rpx solid #ebebeb;
+  border-bottom: 1rpx solid #ebebeb;
+}
+
+.item-line {
+  font-size: 26rpx;
+  color: #4d4d4d;
+  line-height: 1.6;
 }
 
 .order-foot {
   margin-top: 18rpx;
 }
 
+.status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40rpx;
+  border-radius: 100rpx;
+  padding: 0 16rpx;
+  font-size: 24rpx;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.status.status-success {
+  color: #1a7f37;
+  background: #dafbe1;
+}
+
+.status.status-warning {
+  color: #ab570a;
+  background: #ffefcf;
+}
+
+.status.status-error {
+  color: #c50000;
+  background: #f7d4d6;
+}
+
+.status.status-info {
+  color: #0070f3;
+  background: #d3e5ff;
+}

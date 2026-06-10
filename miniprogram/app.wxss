@@ -1,8 +1,9 @@
+/* ─── Vercel Design System ─── */
 page {
   min-height: 100vh;
-  color: #24231f;
-  background: #f7f5ef;
-  font-family: -apple-system, BlinkMacSystemFont, "Microsoft YaHei", sans-serif;
+  color: #171717;
+  background: #fafafa;
+  font-family: -apple-system, "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
   letter-spacing: 0;
 }
 
@@ -14,55 +15,67 @@ textarea {
   box-sizing: border-box;
 }
 
+/* ─── Page Layout ─── */
 .page {
   padding: 24rpx;
 }
 
+/* ─── Card ─── */
 .panel {
-  border: 1rpx solid #ded8cb;
-  border-radius: 12rpx;
+  border: 1rpx solid #ebebeb;
+  border-radius: 16rpx;
   background: #ffffff;
-  box-shadow: 0 8rpx 24rpx rgba(58, 47, 27, 0.06);
+  box-shadow: 0 2rpx 4rpx rgba(0,0,0,0.04), 0 4rpx 8rpx rgba(0,0,0,0.04);
 }
 
+/* ─── Typography ─── */
 .muted {
-  color: #6d675d;
+  color: #888888;
+  font-size: 26rpx;
 }
 
 .price {
-  color: #a8563f;
-  font-weight: 700;
+  color: #171717;
+  font-weight: 600;
 }
 
+/* ─── Buttons ─── */
 .primary-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   min-height: 76rpx;
   border-radius: 12rpx;
-  color: #fff;
-  background: #2f6f5e;
-  font-size: 30rpx;
-  line-height: 76rpx;
+  color: #ffffff;
+  background: #171717;
+  font-size: 28rpx;
+  font-weight: 500;
 }
 
 .secondary-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   min-height: 64rpx;
-  border: 1rpx solid #c7ded4;
-  border-radius: 10rpx;
-  color: #2f6f5e;
-  background: #e9f3ed;
-  font-size: 28rpx;
-  line-height: 64rpx;
+  border: 1rpx solid #ebebeb;
+  border-radius: 12rpx;
+  color: #171717;
+  background: #ffffff;
+  font-size: 26rpx;
+  font-weight: 500;
 }
 
 .danger-btn {
-  color: #a8563f;
-  border-color: #e4c8bd;
-  background: #f7e9e3;
+  color: #ee0000;
+  border-color: #f7d4d6;
+  background: #f7d4d6;
 }
 
+/* ─── Form ─── */
 .field {
   display: block;
   margin-bottom: 20rpx;
-  color: #6d675d;
+  color: #4d4d4d;
   font-size: 26rpx;
 }
 
@@ -72,32 +85,78 @@ textarea {
   width: 100%;
   min-height: 78rpx;
   margin-top: 8rpx;
-  border: 1rpx solid #ded8cb;
-  border-radius: 10rpx;
+  border: 1rpx solid #ebebeb;
+  border-radius: 12rpx;
   padding: 16rpx;
-  color: #24231f;
-  background: #fff;
+  color: #171717;
+  background: #ffffff;
   font-size: 28rpx;
 }
 
+/* ─── Status Badge ─── */
 .status {
   display: inline-flex;
   align-items: center;
   min-height: 40rpx;
-  border-radius: 999rpx;
+  border-radius: 100rpx;
   padding: 0 16rpx;
-  color: #245648;
-  background: #e9f3ed;
   font-size: 24rpx;
+  font-weight: 500;
+}
+
+.status.success {
+  color: #1a7f37;
+  background: #dafbe1;
 }
 
 .status.warn {
-  color: #7a5314;
-  background: #fbf1de;
+  color: #ab570a;
+  background: #ffefcf;
 }
 
 .status.danger {
-  color: #b23b3b;
-  background: #fdeceb;
+  color: #c50000;
+  background: #f7d4d6;
 }
 
+.status.info {
+  color: #0070f3;
+  background: #d3e5ff;
+}
+
+/* ─── Loading / Empty ─── */
+.loading,
+.empty {
+  padding: 48rpx 24rpx;
+  color: #888888;
+  text-align: center;
+}
+
+/* ─── Hero Section ─── */
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+  margin-bottom: 24rpx;
+  padding: 32rpx;
+  background: #ffffff;
+  border: 1rpx solid #ebebeb;
+  border-radius: 24rpx;
+  box-shadow: 0 2rpx 4rpx rgba(0,0,0,0.04), 0 4rpx 8rpx rgba(0,0,0,0.04);
+}
+
+.hero-title {
+  display: block;
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #171717;
+}
+
+.hero-sub {
+  display: block;
+  margin-top: 10rpx;
+  color: #888888;
+  font-size: 26rpx;
+  line-height: 1.45;
+}

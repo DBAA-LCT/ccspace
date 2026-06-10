@@ -4,9 +4,13 @@
 
 .tip {
   margin-top: 24rpx;
-  padding: 22rpx;
-  color: #6d675d;
-  font-size: 26rpx;
-  line-height: 1.5;
+  padding: 24rpx;
+  background: #fafafa;
+  border-radius: 16rpx;
 }
 
+.tip-text {
+  color: #888888;
+  font-size: 24rpx;
+  line-height: 1.6;
+}

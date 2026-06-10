@@ -5,6 +5,7 @@ Page({
     cart: [],
     totalYuan: "0.00",
     profile: {},
+    formData: {},
     submitting: false
   },
 
@@ -16,11 +17,20 @@ Page({
     const app = getApp();
     const cart = app.globalData.cart || [];
     const totalCents = cart.reduce((sum, item) => sum + item.priceCents * item.quantity, 0);
+    const profile = app.globalData.profile || {};
     this.setData({
       cart,
       totalYuan: api.yuan(totalCents),
-      profile: app.globalData.profile || {}
+      profile,
+      formData: { ...profile }
     });
+  },
+
+  onFieldChange(event) {
+    const field = event.currentTarget.dataset.field;
+    if (field) {
+      this.setData({ [`formData.${field}`]: event.detail.value });
+    }
   },
 
   saveCart(cart) {
@@ -40,8 +50,8 @@ Page({
     this.saveCart(this.data.cart.filter(entry => entry.id !== event.currentTarget.dataset.id));
   },
 
-  async submitOrder(event) {
-    const values = event.detail.value;
+  submitOrder() {
+    const values = this.data.formData;
     const requiredFields = ["customerName", "customerPhone", "receiverName", "receiverPhone", "address"];
     const missing = requiredFields.some(field => !String(values[field] || "").trim());
     if (missing) {
@@ -50,33 +60,35 @@ Page({
     }
 
     this.setData({ submitting: true });
-    try {
-      const order = await api.request("/api/orders", {
-        method: "POST",
-        data: {
-          ...values,
-          deliveryType: "home_delivery",
-          items: this.data.cart.map(item => ({
-            productId: item.id,
-            quantity: item.quantity
-          }))
-        }
+    api.request("/api/orders", {
+      method: "POST",
+      data: {
+        ...values,
+        deliveryType: "home_delivery",
+        items: this.data.cart.map(item => ({
+          productId: item.id,
+          quantity: item.quantity
+        }))
+      }
+    })
+      .then(order => {
+        getApp().saveProfile(values);
+        getApp().saveCart([]);
+        wx.showModal({
+          title: "下单成功",
+          content: "订单号：" + order.orderNo,
+          showCancel: false,
+          success() {
+            wx.switchTab({ url: "/pages/orders/orders" });
+          }
+        });
+      })
+      .catch(error => {
+        wx.showToast({ title: error.message || "下单失败", icon: "none" });
+      })
+      .finally(() => {
+        this.setData({ submitting: false });
       });
-      getApp().saveProfile(values);
-      getApp().saveCart([]);
-      wx.showModal({
-        title: "下单成功",
-        content: `订单号：${order.orderNo}`,
-        showCancel: false,
-        success() {
-          wx.switchTab({ url: "/pages/orders/orders" });
-        }
-      });
-    } catch (error) {
-      wx.showToast({ title: error.message, icon: "none" });
-    } finally {
-      this.setData({ submitting: false });
-    }
   },
 
   goHome() {

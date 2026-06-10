@@ -12,3 +12,7 @@ Thumbs.db
 *.sqlite3
 
 .npm-cache/
+
+# Design references (not for production)
+.design-reference/
+miniprogram/miniprogram_npm/

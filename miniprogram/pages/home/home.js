@@ -16,21 +16,22 @@ Page({
     this.loadProducts().finally(() => wx.stopPullDownRefresh());
   },
 
-  async loadProducts() {
+  loadProducts() {
     this.setData({ loading: true });
-    try {
-      const products = await api.request("/api/products?status=on_sale");
-      this.setData({
-        products: products.map(item => ({
-          ...item,
-          priceYuan: api.yuan(item.priceCents)
-        })),
-        loading: false
+    return api.request("/api/products?status=on_sale")
+      .then(products => {
+        this.setData({
+          products: products.map(item => ({
+            ...item,
+            priceYuan: api.yuan(item.priceCents)
+          })),
+          loading: false
+        });
+      })
+      .catch(error => {
+        this.setData({ loading: false, products: [] });
+        wx.showToast({ title: error.message || "加载失败", icon: "none" });
       });
-    } catch (error) {
-      this.setData({ loading: false });
-      wx.showToast({ title: error.message, icon: "none" });
-    }
   },
 
   updateCartCount() {
@@ -73,4 +74,3 @@ Page({
     wx.switchTab({ url: "/pages/cart/cart" });
   }
 });
-

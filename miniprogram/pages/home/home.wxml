@@ -1,14 +1,16 @@
 <view class="page">
-  <view class="hero panel">
+  <view class="hero">
     <view>
       <text class="hero-title">给家里老人买点需要的</text>
       <text class="hero-sub">下单后由小店送到家，也可以和代收快递一起配送</text>
     </view>
-    <t-button theme="light" class="cart-button" bindtap="goCart">购物车 {{cartCount}}</t-button>
+    <t-button size="small" shape="round" class="cart-btn" bindtap="goCart">
+      购物车 {{cartCount}}
+    </t-button>
   </view>
 
-  <view wx:if="{{loading}}" class="loading">
-    <t-loading theme="circular" text="正在加载商品" />
+  <view wx:if="{{loading}}" class="loading panel">
+    <text>正在加载商品...</text>
   </view>
 
   <view wx:elif="{{products.length === 0}}" class="empty panel">
@@ -21,16 +23,18 @@
       <view class="product-body">
         <view class="product-head">
           <text class="product-name">{{item.name}}</text>
-          <t-tag theme="warning" variant="light">{{item.category}}</t-tag>
+          <view class="tag">{{item.category}}</view>
         </view>
         <text class="product-desc">{{item.description}}</text>
         <view class="product-foot">
           <view>
             <text class="price">￥{{item.priceYuan}}</text>
-            <text class="muted"> / {{item.unit}}</text>
+            <text class="unit"> / {{item.unit}}</text>
             <text class="stock">库存 {{item.stock}}</text>
           </view>
-          <t-button theme="primary" size="small" class="add-button" data-id="{{item.id}}" bindtap="addToCart">加入</t-button>
+          <t-button theme="primary" size="small" shape="round" data-id="{{item.id}}" bindtap="addToCart">
+            加入
+          </t-button>
         </view>
       </view>
     </view>

@@ -1,7 +1,12 @@
-const API_BASE = "http://119.45.182.166:3784";
+const API_BASE = "http://192.168.3.86:3784";
+const TIMEOUT = 8000;
 
 function request(path, options = {}) {
   return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(new Error("请求超时，请检查网络或服务器"));
+    }, TIMEOUT);
+
     wx.request({
       url: `${API_BASE}${path}`,
       method: options.method || "GET",
@@ -9,7 +14,9 @@ function request(path, options = {}) {
       header: {
         "content-type": "application/json"
       },
+      timeout: TIMEOUT,
       success(res) {
+        clearTimeout(timer);
         if (res.statusCode >= 200 && res.statusCode < 300) {
           resolve(res.data.data || res.data);
           return;
@@ -17,6 +24,7 @@ function request(path, options = {}) {
         reject(new Error((res.data && res.data.error) || "请求失败"));
       },
       fail(error) {
+        clearTimeout(timer);
         reject(new Error(error.errMsg || "网络异常"));
       }
     });
