@@ -6,11 +6,18 @@ Page({
     totalYuan: "0.00",
     profile: {},
     formData: {},
-    submitting: false
+    submitting: false,
+    noteTemplates: [],
+    deliveryDates: [],
+    selectedDateIndex: 0,
+    promotions: []
   },
 
   onShow() {
     this.refresh();
+    this.loadTemplates();
+    this.loadPromotions();
+    this.initDeliveryDates();
   },
 
   refresh() {
@@ -22,7 +29,40 @@ Page({
       cart,
       totalYuan: api.yuan(totalCents),
       profile,
-      formData: { ...profile }
+      formData: { ...profile, deliveryDate: this.data.deliveryDates[this.data.selectedDateIndex] || "" }
+    });
+  },
+
+  loadTemplates() {
+    api.request("/api/note-templates").then(noteTemplates => {
+      this.setData({ noteTemplates });
+    }).catch(() => {});
+  },
+
+  loadPromotions() {
+    api.request("/api/promotions").then(promotions => {
+      this.setData({ promotions });
+    }).catch(() => {});
+  },
+
+  initDeliveryDates() {
+    const dates = [];
+    const today = new Date();
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(today);
+      d.setDate(d.getDate() + i);
+      const label = i === 0 ? "尽快送达" : i === 1 ? "明天" : `${d.getMonth() + 1}月${d.getDate()}日`;
+      const value = d.toISOString().split("T")[0];
+      dates.push({ label, value });
+    }
+    this.setData({ deliveryDates: dates });
+  },
+
+  onSelectDate(event) {
+    const index = event.currentTarget.dataset.index;
+    this.setData({
+      selectedDateIndex: index,
+      "formData.deliveryDate": this.data.deliveryDates[index].value
     });
   },
 
@@ -31,6 +71,12 @@ Page({
     if (field) {
       this.setData({ [`formData.${field}`]: event.detail.value });
     }
+  },
+
+  onNoteTemplate(event) {
+    const text = event.currentTarget.dataset.text;
+    const current = this.data.formData.note || "";
+    this.setData({ "formData.note": current ? current + "，" + text : text });
   },
 
   saveCart(cart) {
@@ -47,7 +93,23 @@ Page({
   },
 
   remove(event) {
-    this.saveCart(this.data.cart.filter(entry => entry.id !== event.currentTarget.dataset.id));
+    const id = event.currentTarget.dataset.id;
+    const item = this.data.cart.find(entry => entry.id === id);
+    if (!item) return;
+    wx.showModal({
+      title: "确认移除",
+      content: `确定要从购物车移除「${item.name}」吗？`,
+      success: (res) => {
+        if (res.confirm) {
+          this.saveCart(this.data.cart.filter(entry => entry.id !== id));
+          wx.showToast({ title: "已移除", icon: "success" });
+        }
+      }
+    });
+  },
+
+  validatePhone(phone) {
+    return /^1[3-9]\d{9}$/.test(phone);
   },
 
   submitOrder() {
@@ -58,6 +120,14 @@ Page({
       wx.showToast({ title: "请补全联系人和地址", icon: "none" });
       return;
     }
+    if (!this.validatePhone(values.customerPhone)) {
+      wx.showToast({ title: "下单人手机号格式不正确", icon: "none" });
+      return;
+    }
+    if (!this.validatePhone(values.receiverPhone)) {
+      wx.showToast({ title: "收货人电话格式不正确", icon: "none" });
+      return;
+    }
 
     this.setData({ submitting: true });
     api.request("/api/orders", {
@@ -65,6 +135,7 @@ Page({
       data: {
         ...values,
         deliveryType: "home_delivery",
+        deliveryDate: values.deliveryDate || "",
         items: this.data.cart.map(item => ({
           productId: item.id,
           quantity: item.quantity

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .database import Base
@@ -34,11 +34,15 @@ class Product(Base):
     name: Mapped[str] = mapped_column(String(160), nullable=False)
     category: Mapped[str] = mapped_column(String(80), nullable=False, index=True)
     price_cents: Mapped[int] = mapped_column(Integer, nullable=False)
+    original_price_cents: Mapped[int] = mapped_column(Integer, nullable=True)
     stock: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     unit: Mapped[str] = mapped_column(String(32), nullable=False)
     image_url: Mapped[str] = mapped_column(String(500), nullable=False, default="")
     description: Mapped[str] = mapped_column(Text, nullable=False, default="")
     status: Mapped[str] = mapped_column(String(32), nullable=False, default="on_sale", index=True)
+    sales_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    rating_sum: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    rating_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
 
@@ -54,9 +58,14 @@ class Order(Base):
     receiver_phone: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
     address: Mapped[str] = mapped_column(String(255), nullable=False)
     delivery_type: Mapped[str] = mapped_column(String(40), nullable=False, default="home_delivery")
+    delivery_date: Mapped[str] = mapped_column(String(20), nullable=False, default="")
     note: Mapped[str] = mapped_column(Text, nullable=False, default="")
     total_cents: Mapped[int] = mapped_column(Integer, nullable=False)
+    discount_cents: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     status: Mapped[str] = mapped_column(String(32), nullable=False, default="pending", index=True)
+    delivery_photo: Mapped[str] = mapped_column(String(500), nullable=False, default="")
+    delivery_photo_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    group_id: Mapped[str] = mapped_column(String(32), nullable=False, default="", index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     items: Mapped[list["OrderItem"]] = relationship(back_populates="order", cascade="all, delete-orphan")
@@ -92,3 +101,50 @@ class Parcel(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
 
+
+class Review(Base):
+    __tablename__ = "reviews"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    product_id: Mapped[int] = mapped_column(ForeignKey("products.id"), nullable=False, index=True)
+    order_id: Mapped[int] = mapped_column(ForeignKey("orders.id"), nullable=False, index=True)
+    customer_phone: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
+    rating: Mapped[int] = mapped_column(Integer, nullable=False)
+    content: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+
+
+class Promotion(Base):
+    __tablename__ = "promotions"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String(160), nullable=False)
+    type: Mapped[str] = mapped_column(String(32), nullable=False)
+    threshold_cents: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    discount_cents: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    product_id: Mapped[int | None] = mapped_column(ForeignKey("products.id"), nullable=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    start_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    end_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+
+
+class Reminder(Base):
+    __tablename__ = "reminders"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    customer_phone: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
+    product_id: Mapped[int] = mapped_column(ForeignKey("products.id"), nullable=False)
+    interval_days: Mapped[int] = mapped_column(Integer, nullable=False, default=30)
+    next_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, index=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+
+
+class SearchLog(Base):
+    __tablename__ = "search_logs"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    keyword: Mapped[str] = mapped_column(String(160), nullable=False, index=True)
+    source: Mapped[str] = mapped_column(String(32), nullable=False, default="miniprogram")
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)

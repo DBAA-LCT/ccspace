@@ -1,15 +1,20 @@
 <view class="page">
   <form class="search-bar panel" bindsubmit="searchOrders">
-    <t-input name="phone" value="{{phone}}" placeholder="输入下单人或老人手机号" type="number" />
+    <t-input name="phone" value="{{phone}}" placeholder="输入下单人或收货人手机号" type="number" />
     <t-button theme="primary" form-type="submit" shape="round">查询</t-button>
   </form>
 
   <view wx:if="{{loading}}" class="loading panel">
-    <text>正在加载订单...</text>
+    <t-loading theme="circular" size="40rpx" />
+    <text style="margin-top: 16rpx">正在加载订单...</text>
   </view>
 
-  <view wx:elif="{{orders.length === 0}}" class="empty panel">
+  <view wx:elif="{{orders.length === 0 && phone}}" class="empty panel">
     <t-empty description="暂无订单" />
+  </view>
+
+  <view wx:elif="{{orders.length === 0 && !phone}}" class="empty panel">
+    <t-empty description="请输入手机号查询订单" />
   </view>
 
   <view wx:else class="order-list">
@@ -19,18 +24,32 @@
           <text class="order-no">{{item.orderNo}}</text>
           <text class="muted">{{item.createdText}}</text>
         </view>
-        <view class="status {{item.statusClass}}">{{item.statusText}}</view>
+        <view class="{{item.statusClass}}">{{item.statusText}}</view>
       </view>
       <view class="receiver">
         <text class="receiver-name">{{item.receiverName}} {{item.receiverPhone}}</text>
         <text class="muted">{{item.address}}</text>
+        <text wx:if="{{item.deliveryDate}}" class="muted">期望送达: {{item.deliveryDate}}</text>
       </view>
       <view class="items">
-        <text wx:for="{{item.items}}" wx:key="productId" class="item-line">{{item.name}} x {{item.quantity}}</text>
+        <text wx:for="{{item.items}}" wx:for-item="prod" wx:key="productId" class="item-line">{{prod.name}} x {{prod.quantity}}</text>
       </view>
+
+      <view wx:if="{{item.hasPhoto}}" class="photo-section">
+        <text class="photo-label">送达照片</text>
+        <image class="delivery-photo" mode="aspectFill" src="{{item.deliveryPhoto}}" data-url="{{item.deliveryPhoto}}" bindtap="viewPhoto"></image>
+      </view>
+
       <view class="order-foot">
-        <text class="muted">{{item.note}}</text>
+        <view class="foot-left">
+          <text class="muted">{{item.note}}</text>
+        </view>
         <text class="price">￥{{item.totalYuan}}</text>
+      </view>
+
+      <view class="order-actions">
+        <t-button wx:if="{{item.canCancel}}" size="small" variant="outline" data-id="{{item.id}}" bindtap="cancelOrder">取消订单</t-button>
+        <t-button size="small" variant="outline" data-id="{{item.id}}" bindtap="reorder">再来一单</t-button>
       </view>
     </view>
   </view>

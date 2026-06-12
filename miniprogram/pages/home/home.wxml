@@ -1,7 +1,7 @@
 <view class="page">
   <view class="hero">
     <view>
-      <text class="hero-title">给家里老人买点需要的</text>
+      <text class="hero-title">给家人买点需要的</text>
       <text class="hero-sub">下单后由小店送到家，也可以和代收快递一起配送</text>
     </view>
     <t-button size="small" shape="round" class="cart-btn" bindtap="goCart">
@@ -9,16 +9,39 @@
     </t-button>
   </view>
 
+  <view class="search-bar panel">
+    <t-input value="{{searchKey}}" placeholder="搜索商品..." bind:input="onSearchInput" bind:confirm="onSearchConfirm" bind:clear="onSearchClear" clearable />
+  </view>
+
+  <view wx:if="{{hotSearches.length > 0 && !searchKey}}" class="hot-searches">
+    <text class="hot-label">热门搜索</text>
+    <view class="hot-tags">
+      <text wx:for="{{hotSearches}}" wx:key="*this" class="hot-tag" data-keyword="{{item}}" bindtap="onHotSearch">{{item}}</text>
+    </view>
+  </view>
+
+  <view wx:if="{{hotProducts.length > 0 && !searchKey}}" class="hot-section">
+    <text class="hot-label">大家都在买</text>
+    <scroll-view scroll-x class="hot-scroll">
+      <view wx:for="{{hotProducts}}" wx:key="id" class="hot-card" data-id="{{item.id}}" bindtap="goDetail">
+        <image class="hot-img" mode="aspectFill" src="{{item.imageUrl}}"></image>
+        <text class="hot-name">{{item.name}}</text>
+        <text class="price">￥{{item.priceYuan}}</text>
+      </view>
+    </scroll-view>
+  </view>
+
   <view wx:if="{{loading}}" class="loading panel">
-    <text>正在加载商品...</text>
+    <t-loading theme="circular" size="40rpx" />
+    <text style="margin-top: 16rpx">正在加载商品...</text>
   </view>
 
   <view wx:elif="{{products.length === 0}}" class="empty panel">
-    <t-empty description="暂无上架商品" />
+    <t-empty description="{{searchKey ? '没有找到相关商品' : '暂无上架商品'}}" />
   </view>
 
   <view wx:else class="product-list">
-    <view wx:for="{{products}}" wx:key="id" class="product-card panel">
+    <view wx:for="{{products}}" wx:key="id" class="product-card panel" data-id="{{item.id}}" bindtap="goDetail">
       <image class="product-image" mode="aspectFill" src="{{item.imageUrl}}"></image>
       <view class="product-body">
         <view class="product-head">
@@ -28,11 +51,18 @@
         <text class="product-desc">{{item.description}}</text>
         <view class="product-foot">
           <view>
-            <text class="price">￥{{item.priceYuan}}</text>
-            <text class="unit"> / {{item.unit}}</text>
-            <text class="stock">库存 {{item.stock}}</text>
+            <view class="price-row">
+              <text class="price">￥{{item.priceYuan}}</text>
+              <text wx:if="{{item.hasDiscount}}" class="original-price">￥{{item.originalPriceYuan}}</text>
+            </view>
+            <view class="meta-row">
+              <text class="unit">/ {{item.unit}}</text>
+              <text wx:if="{{item.ratingText}}" class="rating">★ {{item.ratingText}}</text>
+              <text wx:if="{{item.salesCount > 0}}" class="sales">已售{{item.salesCount}}</text>
+              <text class="stock" wx:if="{{item.stock <= 3}}" style="color: #ee0000">仅剩{{item.stock}}</text>
+            </view>
           </view>
-          <t-button theme="primary" size="small" shape="round" data-id="{{item.id}}" bindtap="addToCart">
+          <t-button theme="primary" size="small" shape="round" data-id="{{item.id}}" catchtap="addToCart">
             加入
           </t-button>
         </view>

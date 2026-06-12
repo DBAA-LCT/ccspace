@@ -6,27 +6,25 @@
 http://localhost:3784
 ```
 
-服务器部署后通常为：
-
-```text
-http://119.45.182.166:3784
-```
-
 成功响应：
 
 ```json
-{
-  "data": {}
-}
+{ "data": {} }
 ```
 
 错误响应：
 
 ```json
-{
-  "error": "错误信息"
-}
+{ "error": "错误信息" }
 ```
+
+分页响应：
+
+```json
+{ "data": [], "total": 100, "page": 1, "pageSize": 20 }
+```
+
+---
 
 ## 管理端登录
 
@@ -46,6 +44,17 @@ Content-Type: application/json
 Authorization: Bearer <token>
 ```
 
+## 管理员管理
+
+```http
+GET  /api/admin/me                    # 获取当前管理员信息
+POST /api/admin/change-password       # 修改密码
+GET  /api/admin/admins                # 管理员列表（仅店主）
+POST /api/admin/admins                # 创建管理员（仅店主）
+PUT  /api/admin/admins/:id            # 修改管理员（仅店主）
+DELETE /api/admin/admins/:id          # 删除管理员（仅店主）
+```
+
 ## 商品接口
 
 公开查询：
@@ -54,38 +63,25 @@ Authorization: Bearer <token>
 GET /api/products
 GET /api/products?status=on_sale
 GET /api/products?q=大米
-GET /api/products/:id
+GET /api/products?category=粮油副食
+GET /api/products/categories          # 获取所有分类
+GET /api/products/:id                 # 商品详情
 ```
 
-管理端新增商品：
+管理端：
 
 ```http
-POST /api/admin/products
-Authorization: Bearer <token>
-Content-Type: application/json
-
-{
-  "name": "东北珍珠米 10斤",
-  "category": "粮油副食",
-  "priceCents": 3900,
-  "stock": 12,
-  "unit": "袋",
-  "imageUrl": "https://example.com/rice.jpg",
-  "description": "适合家庭日常煮饭",
-  "status": "on_sale"
-}
-```
-
-管理端更新商品：
-
-```http
-PUT /api/admin/products/:id
-PATCH /api/admin/products/:id/status
+GET    /api/admin/products?page=1&page_size=20&q=&status=&category=
+POST   /api/admin/products            # 新增
+PUT    /api/admin/products/:id         # 全量更新
+PATCH  /api/admin/products/:id         # 部分更新
+PATCH  /api/admin/products/:id/status  # 上下架
+DELETE /api/admin/products/:id         # 删除（无关联订单时）
 ```
 
 ## 订单接口
 
-小程序查询自己的订单：
+小程序查询订单：
 
 ```http
 GET /api/orders?phone=13800000001
@@ -102,91 +98,95 @@ Content-Type: application/json
   "customerPhone": "13800000001",
   "receiverName": "张奶奶",
   "receiverPhone": "13900000001",
-  "address": "幸福村三组老槐树旁",
+  "address": "幸福村三组12号",
   "deliveryType": "home_delivery",
   "note": "和快递一起送",
-  "items": [
-    {
-      "productId": 1,
-      "quantity": 1
-    }
-  ]
+  "items": [{ "productId": 1, "quantity": 1 }]
 }
 ```
 
-创建订单会扣减库存；订单改为 `cancelled` 时会回补库存。
-
-管理端查询订单：
+用户取消订单（pending/confirmed 状态可取消）：
 
 ```http
-GET /api/admin/orders
-GET /api/admin/orders?status=pending
+PATCH /api/orders/:id/cancel
 ```
 
-管理端修改订单状态：
+管理端：
 
 ```http
+GET   /api/admin/orders?page=1&page_size=20&q=&status=
 PATCH /api/admin/orders/:id/status
-Content-Type: application/json
-
-{
-  "status": "delivering"
-}
 ```
 
-订单状态：
+订单状态流转：
 
-```text
-pending      待确认
-confirmed    待配送
-delivering   配送中
-completed    已完成
-cancelled    已取消
+```
+pending → confirmed → delivering → completed
+   ↓         ↓           ↓
+cancelled cancelled  cancelled
 ```
 
 ## 快递接口
 
-管理端查询快递：
-
 ```http
-GET /api/admin/parcels
-GET /api/admin/parcels?status=pending
-```
-
-登记快递：
-
-```http
-POST /api/admin/parcels
-Content-Type: application/json
-
-{
-  "receiverName": "张奶奶",
-  "receiverPhone": "13900000001",
-  "carrier": "中通快递",
-  "trackingNo": "ZT1234567890",
-  "pickupCode": "3-12",
-  "address": "幸福村三组老槐树旁",
-  "note": "可和订单一起配送"
-}
-```
-
-修改快递状态：
-
-```http
+GET   /api/admin/parcels?page=1&page_size=20&q=&status=
+POST  /api/admin/parcels
 PATCH /api/admin/parcels/:id/status
-Content-Type: application/json
+DELETE /api/admin/parcels/:id    # 仅待配送/已取消可删除
+```
 
+快递状态流转：
+
+```
+pending → delivering → completed
+   ↓          ↓
+cancelled  cancelled
+```
+
+## 仪表盘统计
+
+```http
+GET /api/admin/summary
+```
+
+返回：
+
+```json
 {
-  "status": "completed"
+  "data": {
+    "productCount": 10,
+    "onSaleCount": 8,
+    "pendingOrderCount": 3,
+    "pendingParcelCount": 2,
+    "revenueCents": 125000,
+    "todayOrderCount": 5
+  }
 }
 ```
 
-快递状态：
+## 健康检查
 
-```text
-pending      待配送
-delivering   配送中
-completed    已送达
-cancelled    已取消
+```http
+GET /health
 ```
 
+---
+
+## 订单状态说明
+
+| 状态 | 含义 | 可流转到 |
+|------|------|----------|
+| `pending` | 待确认 | confirmed, cancelled |
+| `confirmed` | 待配送 | delivering, cancelled |
+| `delivering` | 配送中 | completed, cancelled |
+| `completed` | 已完成 | — |
+| `cancelled` | 已取消 | — |
+
+## 快递状态说明
+
+| 状态 | 含义 | 可流转到 |
+|------|------|----------|
+| `pending` | 待配送 | delivering, cancelled |
+| `delivering` | 配送中 | completed, cancelled |
+| `completed` | 已送达 | — |
+| `cancelled` | 已取消 | — |

@@ -1,0 +1,81 @@
+.detail-image {
+  display: block;
+  width: 100%;
+  height: 500rpx;
+  background: #f5f5f5;
+}
+
+.detail-body {
+  padding: 32rpx;
+}
+
+.detail-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+.detail-name {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #171717;
+  line-height: 1.4;
+}
+
+.tag {
+  flex: 0 0 auto;
+  border-radius: 100rpx;
+  padding: 4rpx 16rpx;
+  color: #4d4d4d;
+  background: #fafafa;
+  font-size: 22rpx;
+  font-weight: 500;
+}
+
+.detail-price {
+  margin-top: 24rpx;
+}
+
+.detail-stock {
+  margin-top: 16rpx;
+}
+
+.detail-desc {
+  margin-top: 32rpx;
+  padding-top: 32rpx;
+  border-top: 1rpx solid #ebebeb;
+}
+
+.desc-label {
+  display: block;
+  margin-bottom: 12rpx;
+  font-size: 26rpx;
+  font-weight: 500;
+  color: #171717;
+}
+
+.desc-text {
+  display: block;
+  font-size: 28rpx;
+  color: #4d4d4d;
+  line-height: 1.7;
+}
+
+.detail-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20rpx;
+  padding: 24rpx 32rpx;
+  padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
+  background: #ffffff;
+  border-top: 1rpx solid #ebebeb;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.page {
+  padding-bottom: 180rpx;
+}

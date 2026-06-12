@@ -1,5 +1,5 @@
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -19,7 +19,10 @@ class Settings:
     db_password: str = os.getenv("DB_PASSWORD", "")
     db_name: str = os.getenv("DB_NAME", "ccspace")
     admin_user: str = os.getenv("ADMIN_USER", "admin")
-    admin_password: str = os.getenv("ADMIN_PASSWORD", "admin123456")
+    admin_password: str = os.getenv("ADMIN_PASSWORD", "")
+    cors_origins: list[str] = field(default_factory=lambda: os.getenv("CORS_ORIGINS", "*").split(","))
+    session_ttl_hours: int = int(os.getenv("SESSION_TTL_HOURS", "24"))
+    login_rate_limit: int = int(os.getenv("LOGIN_RATE_LIMIT", "5"))
 
     @property
     def database_url(self) -> str:

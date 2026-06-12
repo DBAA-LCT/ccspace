@@ -1,0 +1,55 @@
+<view class="page">
+  <view wx:if="{{loading}}" class="loading panel">
+    <t-loading theme="circular" size="40rpx" />
+    <text style="margin-top: 16rpx">正在加载...</text>
+  </view>
+
+  <view wx:elif="{{!product}}" class="empty panel">
+    <t-empty description="商品不存在或已下架" />
+  </view>
+
+  <block wx:else>
+    <image class="detail-image" mode="aspectFill" src="{{product.imageUrl}}"></image>
+    <view class="detail-body panel">
+      <view class="detail-head">
+        <text class="detail-name">{{product.name}}</text>
+        <view class="tag">{{product.category}}</view>
+      </view>
+      <view class="detail-price">
+        <text class="price">￥{{product.priceYuan}}</text>
+        <text wx:if="{{product.hasDiscount}}" class="original-price">￥{{product.originalPriceYuan}}</text>
+        <text class="unit"> / {{product.unit}}</text>
+      </view>
+      <view class="detail-meta">
+        <text class="muted">库存: {{product.stock}} {{product.unit}}</text>
+        <text wx:if="{{product.stock <= 3}}" style="color: #ee0000; margin-left: 16rpx">库存紧张</text>
+        <text wx:if="{{product.ratingText}}" class="rating" style="margin-left: 16rpx">★ {{product.ratingText}} ({{product.ratingCount}}条评价)</text>
+        <text wx:if="{{product.salesCount > 0}}" class="muted" style="margin-left: 16rpx">已售{{product.salesCount}}</text>
+      </view>
+      <view class="detail-desc" wx:if="{{product.description}}">
+        <text class="desc-label">商品说明</text>
+        <text class="desc-text">{{product.description}}</text>
+      </view>
+    </view>
+
+    <view class="reviews-section panel" wx:if="{{reviews.length > 0}}">
+      <text class="section-title">用户评价 ({{reviews.length}})</text>
+      <view wx:for="{{reviews}}" wx:key="id" class="review-item">
+        <view class="review-head">
+          <text class="review-phone">{{item.customerPhone}}</text>
+          <text class="review-rating">★ {{item.rating}}</text>
+        </view>
+        <text wx:if="{{item.content}}" class="review-content">{{item.content}}</text>
+      </view>
+    </view>
+
+    <view class="detail-actions">
+      <t-button theme="primary" block shape="round" bindtap="addToCart" disabled="{{product.stock <= 0}}">
+        {{product.stock > 0 ? '加入购物车' : '已售罄'}}
+      </t-button>
+      <t-button block shape="round" bindtap="goCart">
+        购物车 ({{cartCount}})
+      </t-button>
+    </view>
+  </block>
+</view>

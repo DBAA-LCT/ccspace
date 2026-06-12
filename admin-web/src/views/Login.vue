@@ -2,23 +2,22 @@
   <div class="login-page">
     <div class="login-card">
       <div class="brand-row">
-        <div class="brand-mark">乡</div>
+        <div class="brand-mark">CC</div>
         <div>
-          <div class="brand-title">家乡小店管理台</div>
+          <div class="brand-title">CCspace 管理台</div>
           <div class="brand-sub">商品、订单、快递代收配送统一管理</div>
         </div>
       </div>
-      <t-alert
-        theme="info"
-        message="默认账号 admin，默认密码 admin123456。上线前请通过环境变量修改。"
-        style="margin-bottom: 18px; border-radius: 8px"
-      />
       <t-form :data="loginForm" label-width="0" @submit="login">
         <t-form-item name="username">
           <t-input v-model="loginForm.username" placeholder="账号" clearable />
         </t-form-item>
         <t-form-item name="password">
-          <t-input v-model="loginForm.password" type="password" placeholder="密码" clearable />
+          <t-input v-model="loginForm.password" :type="showPwd ? 'text' : 'password'" placeholder="密码" clearable>
+            <template #suffix>
+              <span class="pwd-toggle" @click="showPwd = !showPwd">{{ showPwd ? '🙈' : '👁' }}</span>
+            </template>
+          </t-input>
         </t-form-item>
         <t-form-item name="apiBase">
           <t-input v-model="apiBaseInput" placeholder="API 地址" clearable />
@@ -41,14 +40,19 @@ import { MessagePlugin } from "tdesign-vue-next";
 
 const router = useRouter();
 const loading = ref(false);
+const showPwd = ref(false);
 const apiBaseInput = ref(apiBase.value);
 
 const loginForm = reactive({
-  username: "admin",
-  password: "admin123456"
+  username: "",
+  password: ""
 });
 
 async function login() {
+  if (!loginForm.username || !loginForm.password) {
+    MessagePlugin.warning("请输入账号和密码");
+    return;
+  }
   loading.value = true;
   try {
     setApiBase(apiBaseInput.value);

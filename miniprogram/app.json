@@ -3,25 +3,22 @@
     "pages/home/home",
     "pages/cart/cart",
     "pages/orders/orders",
-    "pages/profile/profile"
+    "pages/profile/profile",
+    "pages/detail/detail"
   ],
   "window": {
-    "navigationBarTitleText": "家乡小店",
+    "navigationBarTitleText": "CCspace",
     "navigationBarBackgroundColor": "#ffffff",
     "navigationBarTextStyle": "black",
     "backgroundColor": "#fafafa"
   },
   "usingComponents": {
     "t-button": "tdesign-miniprogram/button/button",
-    "t-cell": "tdesign-miniprogram/cell/cell",
-    "t-cell-group": "tdesign-miniprogram/cell-group/cell-group",
     "t-empty": "tdesign-miniprogram/empty/empty",
     "t-input": "tdesign-miniprogram/input/input",
     "t-textarea": "tdesign-miniprogram/textarea/textarea",
     "t-stepper": "tdesign-miniprogram/stepper/stepper",
-    "t-tag": "tdesign-miniprogram/tag/tag",
-    "t-loading": "tdesign-miniprogram/loading/loading",
-    "t-divider": "tdesign-miniprogram/divider/divider"
+    "t-loading": "tdesign-miniprogram/loading/loading"
   },
   "tabBar": {
     "color": "#888888",
@@ -31,19 +28,27 @@
     "list": [
       {
         "pagePath": "pages/home/home",
-        "text": "商品"
+        "text": "商品",
+        "iconPath": "images/tab/home.png",
+        "selectedIconPath": "images/tab/home-active.png"
       },
       {
         "pagePath": "pages/cart/cart",
-        "text": "购物车"
+        "text": "购物车",
+        "iconPath": "images/tab/cart.png",
+        "selectedIconPath": "images/tab/cart-active.png"
       },
       {
         "pagePath": "pages/orders/orders",
-        "text": "订单"
+        "text": "订单",
+        "iconPath": "images/tab/orders.png",
+        "selectedIconPath": "images/tab/orders-active.png"
       },
       {
         "pagePath": "pages/profile/profile",
-        "text": "我的"
+        "text": "我的",
+        "iconPath": "images/tab/profile.png",
+        "selectedIconPath": "images/tab/profile-active.png"
       }
     ]
   },
