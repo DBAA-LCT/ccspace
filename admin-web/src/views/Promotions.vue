@@ -8,8 +8,16 @@
       <t-button theme="primary" shape="round" @click="openDialog()">新建促销</t-button>
     </div>
 
+    <div class="filter-bar">
+      <t-input v-model="searchQ" placeholder="搜索活动名称..." clearable style="width: 220px" @enter="load" />
+      <t-select v-model="filterActive" placeholder="状态筛选" clearable style="width: 120px" @change="load">
+        <t-option :value="true" label="生效中" />
+        <t-option :value="false" label="已停用" />
+      </t-select>
+    </div>
+
     <div class="table-card">
-      <t-table row-key="id" :data="promotions" :columns="promoColumns" :loading="loading" bordered>
+      <t-table row-key="id" :data="pagedPromotions" :columns="promoColumns" :loading="loading" bordered>
         <template #type="{ row }">
           <span class="badge" :class="row.type === 'direct' ? 'badge-success' : 'badge-info'">
             {{ row.type === 'direct' ? '限时特价' : '满减' }}
@@ -34,34 +42,39 @@
           </t-button>
         </template>
       </t-table>
+      <div class="table-footer" v-if="filteredPromotions.length > pageSize">
+        <t-pagination v-model="page" :total="filteredPromotions.length" :page-size="pageSize" show-jumper />
+      </div>
     </div>
 
     <t-dialog v-model:visible="dialogVisible" header="新建促销" width="min(520px, 90vw)" :footer="false">
-      <t-form :data="form" label-width="100px" @submit="submit">
-        <t-form-item label="活动名称" name="name">
-          <t-input v-model="form.name" placeholder="如：牛奶限时特价" />
-        </t-form-item>
-        <t-form-item label="类型" name="type">
-          <t-select v-model="form.type">
-            <t-option value="direct" label="限时特价（商品直降）" />
-            <t-option value="full_reduction" label="满减（满额立减）" />
-          </t-select>
-        </t-form-item>
-        <t-form-item label="满减门槛" name="thresholdCents" v-if="form.type === 'full_reduction'">
-          <t-input-number v-model="form.thresholdYuan" theme="normal" :min="0.01" :decimal-places="2" suffix="元" />
-        </t-form-item>
-        <t-form-item label="优惠金额" name="discountYuan">
-          <t-input-number v-model="form.discountYuan" theme="normal" :min="0.01" :decimal-places="2" suffix="元" />
-        </t-form-item>
-        <t-form-item label="关联商品" name="productId" v-if="form.type === 'direct'">
-          <t-input v-model="form.productId" placeholder="输入商品ID（可选）" />
-        </t-form-item>
-        <t-form-item label="开始时间" name="startAt">
-          <t-input v-model="form.startAt" placeholder="YYYY-MM-DDTHH:MM:SS" />
-        </t-form-item>
-        <t-form-item label="结束时间" name="endAt">
-          <t-input v-model="form.endAt" placeholder="YYYY-MM-DDTHH:MM:SS" />
-        </t-form-item>
+      <t-form :data="form" label-width="80px" @submit="submit">
+        <div class="form-grid">
+          <t-form-item label="活动名称" name="name">
+            <t-input v-model="form.name" placeholder="如：牛奶限时特价" />
+          </t-form-item>
+          <t-form-item label="类型" name="type">
+            <t-select v-model="form.type">
+              <t-option value="direct" label="限时特价" />
+              <t-option value="full_reduction" label="满减" />
+            </t-select>
+          </t-form-item>
+          <t-form-item label="满减门槛" name="thresholdCents" v-if="form.type === 'full_reduction'">
+            <t-input-number v-model="form.thresholdYuan" theme="normal" :min="0.01" :decimal-places="2" suffix="元" />
+          </t-form-item>
+          <t-form-item label="优惠金额" name="discountYuan">
+            <t-input-number v-model="form.discountYuan" theme="normal" :min="0.01" :decimal-places="2" suffix="元" />
+          </t-form-item>
+          <t-form-item label="关联商品" name="productId" v-if="form.type === 'direct'">
+            <t-input v-model="form.productId" placeholder="输入商品ID（可选）" />
+          </t-form-item>
+          <t-form-item label="开始时间" name="startAt">
+            <t-input v-model="form.startAt" placeholder="YYYY-MM-DDTHH:MM:SS" />
+          </t-form-item>
+          <t-form-item label="结束时间" name="endAt">
+            <t-input v-model="form.endAt" placeholder="YYYY-MM-DDTHH:MM:SS" />
+          </t-form-item>
+        </div>
         <div class="dialog-footer">
           <t-button theme="default" @click="dialogVisible = false">取消</t-button>
           <t-button theme="primary" type="submit" :loading="submitting" shape="round">创建</t-button>
@@ -72,7 +85,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from "vue";
+import { ref, reactive, computed, onMounted } from "vue";
 import { request, yuan, formatTime } from "../utils/api";
 import { MessagePlugin } from "tdesign-vue-next";
 
@@ -80,6 +93,27 @@ const promotions = ref([]);
 const loading = ref(false);
 const dialogVisible = ref(false);
 const submitting = ref(false);
+const searchQ = ref("");
+const filterActive = ref("");
+const page = ref(1);
+const pageSize = ref(20);
+
+const filteredPromotions = computed(() => {
+  let list = promotions.value;
+  if (searchQ.value) {
+    const q = searchQ.value.toLowerCase();
+    list = list.filter(p => p.name.toLowerCase().includes(q));
+  }
+  if (filterActive.value !== "") {
+    list = list.filter(p => p.isActive === filterActive.value);
+  }
+  return list;
+});
+
+const pagedPromotions = computed(() => {
+  const start = (page.value - 1) * pageSize.value;
+  return filteredPromotions.value.slice(start, start + pageSize.value);
+});
 
 const promoColumns = [
   { colKey: "name", title: "活动", minWidth: 160 },

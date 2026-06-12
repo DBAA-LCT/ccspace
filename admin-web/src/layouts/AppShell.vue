@@ -32,14 +32,21 @@
       <t-header class="topbar">
         <div class="topbar-left">
           <t-button class="mobile-menu-btn" variant="text" size="small" @click="collapsed = !collapsed">☰</t-button>
-          <div>
-            <div class="topbar-title">{{ currentLabel }}</div>
+          <div class="topbar-breadcrumb">
+            <span class="breadcrumb-home" @click="router.push('/')">首页</span>
+            <span class="breadcrumb-sep" v-if="route.path !== '/'">/</span>
+            <span class="breadcrumb-current" v-if="route.path !== '/'">{{ currentLabel }}</span>
           </div>
         </div>
-        <t-space>
-          <t-button variant="outline" size="small" @click="refreshData">刷新</t-button>
-          <t-button size="small" @click="logout">退出</t-button>
-        </t-space>
+        <div class="topbar-right">
+          <t-dropdown :options="userMenuOptions" @click="handleUserMenu" :min-column-width="120">
+            <div class="user-info">
+              <div class="user-avatar">{{ adminInitial }}</div>
+              <span class="user-name">{{ adminName }}</span>
+              <span class="user-arrow">▾</span>
+            </div>
+          </t-dropdown>
+        </div>
       </t-header>
       <t-content class="workspace">
         <router-view :key="route.fullPath" />
@@ -49,14 +56,22 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import { clearToken } from "../utils/api";
+import { clearToken, request } from "../utils/api";
 import { MessagePlugin } from "tdesign-vue-next";
 
 const router = useRouter();
 const route = useRoute();
 const collapsed = ref(false);
+const adminName = ref("管理员");
+
+const adminInitial = computed(() => (adminName.value ? adminName.value[0] : "管"));
+
+const userMenuOptions = [
+  { content: "刷新页面", value: "refresh" },
+  { content: "退出登录", value: "logout" }
+];
 
 const navItems = [
   { path: "/", icon: "📊", label: "仪表盘" },
@@ -82,13 +97,22 @@ function isActive(path) {
   return route.path.startsWith(path);
 }
 
-function logout() {
-  clearToken();
-  router.push("/login");
-  MessagePlugin.success("已退出");
+function handleUserMenu({ value }) {
+  if (value === "logout") {
+    clearToken();
+    router.push("/login");
+    MessagePlugin.success("已退出");
+  } else if (value === "refresh") {
+    router.replace({ path: route.path, query: { ...route.query, _t: Date.now() } });
+  }
 }
 
-function refreshData() {
-  router.replace({ path: route.path, query: { ...route.query, _t: Date.now() } });
+async function loadAdminInfo() {
+  try {
+    const data = await request("/api/admin/me");
+    if (data?.name) adminName.value = data.name;
+  } catch { /* ignore */ }
 }
+
+onMounted(loadAdminInfo);
 </script>

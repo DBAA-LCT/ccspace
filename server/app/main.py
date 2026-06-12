@@ -513,6 +513,17 @@ def list_categories(db: Session = Depends(get_db)) -> dict:
     return {"data": list(rows)}
 
 
+@app.get("/api/products/hot")
+def hot_products(db: Session = Depends(get_db), limit: int = Query(default=10, ge=1, le=50)) -> dict:
+    products = db.scalars(
+        select(Product)
+        .where(Product.status == "on_sale", Product.sales_count > 0)
+        .order_by(Product.sales_count.desc())
+        .limit(limit)
+    ).all()
+    return {"data": [product_out(p) for p in products]}
+
+
 @app.get("/api/products/{product_id}")
 def product_detail(product_id: int, db: Session = Depends(get_db)) -> dict:
     return {"data": product_out(product_or_404(db, product_id))}
@@ -956,17 +967,6 @@ def hot_searches(db: Session = Depends(get_db), limit: int = Query(default=8, ge
         .limit(limit)
     ).all()
     return {"data": [row[0] for row in rows]}
-
-
-@app.get("/api/products/hot")
-def hot_products(db: Session = Depends(get_db), limit: int = Query(default=10, ge=1, le=50)) -> dict:
-    products = db.scalars(
-        select(Product)
-        .where(Product.status == "on_sale", Product.sales_count > 0)
-        .order_by(Product.sales_count.desc())
-        .limit(limit)
-    ).all()
-    return {"data": [product_out(p) for p in products]}
 
 
 # ── 商品评价 ─────────────────────────────────────────────────────────────────

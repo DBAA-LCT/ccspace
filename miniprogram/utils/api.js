@@ -1,4 +1,4 @@
-const API_BASE = "http://192.168.3.86:3784";
+const API_BASE = "http://localhost:3784";
 const TIMEOUT = 8000;
 
 function request(path, options = {}) {

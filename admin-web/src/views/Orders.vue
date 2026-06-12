@@ -67,9 +67,11 @@
 
     <t-dialog v-model:visible="photoDialogVisible" header="上传送达照片" width="min(480px, 90vw)" :footer="false">
       <t-form :data="photoForm" label-width="80px" @submit="uploadPhoto">
-        <t-form-item label="照片URL" name="photoUrl">
-          <t-input v-model="photoForm.photoUrl" placeholder="输入图片地址或上传后的URL" />
-        </t-form-item>
+        <div class="form-grid">
+          <t-form-item class="wide" label="照片URL" name="photoUrl">
+            <t-input v-model="photoForm.photoUrl" placeholder="输入图片地址或上传后的URL" />
+          </t-form-item>
+        </div>
         <div class="dialog-footer">
           <t-button theme="default" @click="photoDialogVisible = false">取消</t-button>
           <t-button theme="primary" type="submit" :loading="photoSubmitting" shape="round">确认</t-button>
@@ -188,14 +190,3 @@ async function updateStatus(row) {
 
 onMounted(load);
 </script>
-
-<style scoped>
-.photo-thumb {
-  width: 32px;
-  height: 32px;
-  border-radius: 4px;
-  object-fit: cover;
-  cursor: pointer;
-  border: 1px solid var(--hairline);
-}
-</style>
